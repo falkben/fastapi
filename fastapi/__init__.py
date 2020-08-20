@@ -10,6 +10,7 @@ from .datastructures import UploadFile
 from .exceptions import HTTPException
 from .param_functions import (
     Body,
+    BodyOrQuery,
     Cookie,
     Depends,
     File,
