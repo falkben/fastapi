@@ -242,7 +242,7 @@ class Body(FieldInfo):
         return f"{self.__class__.__name__}({self.default})"
 
 
-class BodyOrQuery(FieldInfo):
+class BodyOrQuery(Param):
     in_ = ParamTypes.query
 
     def __init__(

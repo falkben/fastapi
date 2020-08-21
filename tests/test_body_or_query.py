@@ -4,17 +4,34 @@ from fastapi.testclient import TestClient
 app = FastAPI()
 
 
+@app.put("/body_alone/")
+async def body_alone(item_id=Body(...)):
+    return {"item_id": item_id}
+
+
 @app.put("/body_query_items/")
-def bodyorquery_only(item_id=BodyOrQuery(...)):
+async def bodyorquery_only(item_id=BodyOrQuery(...)):
     return {"item_id": item_id}
 
 
 @app.put("/body_items/")
-def body_and_bodyorquery(item_id=BodyOrQuery(...), body_id=Body("bar")):
+async def body_and_bodyorquery(item_id=BodyOrQuery(...), body_id=Body("bar")):
     return {"item_id": item_id, "body_id": body_id}
 
 
 client = TestClient(app)
+
+
+def test_put_query_arg_body_or_query():
+    response = client.put("/body_query_items/?item_id=foo")
+    assert response.status_code == 200, response.text
+    assert response.json() == {"item_id": "foo", "body_id": "bar"}
+
+
+def test_put_body_alone():
+    response = client.put("/body_alone/", json={"item_id": "foo"})
+    assert response.status_code == 200, response.text
+    assert response.json() == {"item_id": "foo", "body_id": "bar"}
 
 
 def test_put_query_arg():
@@ -25,12 +42,6 @@ def test_put_query_arg():
 
 def test_put_body():
     response = client.put("/body_items/", json={"item_id": "foo"})
-    assert response.status_code == 200, response.text
-    assert response.json() == {"item_id": "foo", "body_id": "bar"}
-
-
-def test_put_query_arg_body_or_query():
-    response = client.put("/body_query_items/?item_id=foo")
     assert response.status_code == 200, response.text
     assert response.json() == {"item_id": "foo", "body_id": "bar"}
 
